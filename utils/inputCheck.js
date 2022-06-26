@@ -1,4 +1,4 @@
-// utility to check if an object has the required properties
+// utility to check if an object has the required properties, pending implementation...
 // e.g., inputCheck(role, 'title', 'salary', 'manager_id')
 
 module.exports = function(obj, ...props) {

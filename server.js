@@ -3,7 +3,7 @@ const validator = require('validator');
 const cTable = require('console.table');
 const db = require('./db/connection');
 
-const taskChoice = () => {
+const taskChoice = () => { //initial user prompt to select what to do
     inquirer
         .prompt({
             type: 'list',
@@ -19,7 +19,7 @@ const taskChoice = () => {
                 'Update an Existing Employee Role',
                 'Quit']
         })
-        .then((selection) =>    {
+        .then((selection) =>    { //switch case to call new functions based on user choice
             switch (selection.taskChoice) {
                 case 'View All Departments':
                     getDepartments();
@@ -42,14 +42,14 @@ const taskChoice = () => {
                 case 'Update an Existing Employee Role':
                     updateRole();
                     break;
-                case 'Quit':
+                case 'Quit': //option to exit application 
                     quit();
                     break;
             };
         });
 };
 
-function getDepartments() {
+function getDepartments() { //view all departments
     return db.query("SELECT * from department", function(error, result) {
         if (error) {
             throw error;
@@ -62,7 +62,7 @@ function getDepartments() {
     })
 }
 
-function getRoles() {
+function getRoles() { //view all roles
     return db.query("SELECT role.*, department.department_name FROM role LEFT JOIN department ON role.department_id = department.department_id;", function(error, result) {
         if (error) {
             throw error;
@@ -75,8 +75,7 @@ function getRoles() {
     })
 }
 
-function getEmployees() {
-
+function getEmployees() { //view all employees
     return db.query(`SELECT employee.*, department.department_name, role.title, role.salary
     FROM ((employee
     INNER JOIN role ON employee.role_id = role.role_id)
@@ -101,17 +100,17 @@ function addDepartment() {
                 name: 'name',
                 message: 'Please enter the name of the new department:'
             })
-        .then(response => {
+        .then(response => { //once dept name is received from user input, insert directly into the table
             const newDepartment = response.department_name;
             db.query(`INSERT INTO department(name) VALUE ('${newDepartment}');`,
             console.log("New Department Successfully Added!"))
-            getDepartments();
+            getDepartments(); //display confirmation message and show all departments
         });
 };
 
 function addRole() {
     departments = [];
-    db.query('SELECT department_name FROM department', function (err, response) {
+    db.query('SELECT department_name FROM department', function (err, response) { //create new array to store departments names, loop through all departments to populate it
         if (err) throw err;
         for (i =0; i < response.length; i++) {
                 departments.push(response[i].department_name);
@@ -135,14 +134,14 @@ function addRole() {
                 choices: departments
             }        
         ])
-        .then(response => {
+        .then(response => { //once user inputs are received, find the dept ID by referencing the index of the response in the array and adding 1
             const newRoleName = response.title;
             const newRoleSalary = response.salary;
             const newRoleDepartmentName = response.department;
             var newRoleDepartmentId = (departments.indexOf(response.department) + 1);
             db.query(`INSERT INTO role(title, salary, department_id) VALUE ('${newRoleName}', ${newRoleSalary}, ${newRoleDepartmentId})`,
             console.log("New Role Successfully Added!"))
-            getRoles();
+            getRoles(); //display confirmation message and show all roles
         });
 };
 
@@ -197,7 +196,6 @@ function addEmployee() {
             const newEmployeeRoleId = (roles.indexOf(response.title) + 1);
             const newEmployeeManagerName = response.manager;
             const newEmployeeManagerId = (employees.indexOf(response.manager) + 1);
-            var newEmployeeId = (employees.indexOf(response.manager) + 1);
             db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUE ('${newEmployeeFirstName}', '${newEmployeeLastName}', ${newEmployeeRoleId}, ${newEmployeeManagerId})`,
             console.log("New Employee Successfully Added!"))
             getEmployees();
@@ -209,7 +207,6 @@ function updateRole() {
     employees = [];
     roles =[];
     db.query('SELECT employee.employee_id, employee.first_name, employee.last_name FROM employee', function (err, response) {
-        // console.log(response)
         if (err) throw err;
         for (i =0; i < response.length; i++) {
                 employeeNumber = response[i].employee_id;
@@ -254,7 +251,7 @@ function quit() {
     db.end();
 }
 
-taskChoice();
+taskChoice(); //loan initial prompt
 
 // queries 
 //     let managers = db.query(`SELECT manager_id FROM employee`);
