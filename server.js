@@ -14,8 +14,8 @@ const taskChoice = () => { //initial user prompt to select what to do
                 'View All Roles',
                 'View All Employees',
                 'Add a New Department',
-                'Add a New Employee',
                 'Add a New Role',
+                'Add a New Employee',
                 'Update an Existing Employee Role',
                 'Quit']
         })
@@ -33,11 +33,11 @@ const taskChoice = () => { //initial user prompt to select what to do
                 case 'Add a New Department':
                     addDepartment();
                     break;
-                case 'Add a New Role':
-                    addRole();
-                    break;
                 case 'Add a New Employee':
                     addEmployee();
+                    break;
+                case 'Add a New Role':
+                    addRole();
                     break;
                 case 'Update an Existing Employee Role':
                     updateRole();
@@ -77,9 +77,9 @@ function getRoles() { //view all roles
 
 function getEmployees() { //view all employees
     return db.query(`SELECT employee.*, department.department_name, role.title, role.salary
-    FROM ((employee
-    INNER JOIN role ON employee.role_id = role.role_id)
-    LEFT JOIN department ON employee.role_id = department.department_id)
+    FROM employee
+    INNER JOIN role ON employee.role_id = role.role_id
+    LEFT JOIN department ON role.department_id = department.department_id
     ORDER BY employee_id;
     `, function(error, result) {
         if (error) {
@@ -97,12 +97,12 @@ function addDepartment() {
     inquirer
         .prompt({
                 type: 'input',
-                name: 'name',
+                name: 'department_name',
                 message: 'Please enter the name of the new department:'
             })
         .then(response => { //once dept name is received from user input, insert directly into the table
             const newDepartment = response.department_name;
-            db.query(`INSERT INTO department(name) VALUE ('${newDepartment}');`,
+            db.query(`INSERT INTO department(department_name) VALUE ('${newDepartment}');`,
             console.log("New Department Successfully Added!"))
             getDepartments(); //display confirmation message and show all departments
         });
@@ -156,7 +156,7 @@ function addEmployee() {
                 employeeName = employeeFirstName + ' ' + employeeLastName;
                 employees.push(employeeName);
         }
-        console.log(employees)
+        // console.log(employees)
     })
 
     db.query('SELECT title FROM role', function (err, response) {
