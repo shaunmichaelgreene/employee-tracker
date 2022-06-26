@@ -150,13 +150,11 @@ function addEmployee() {
     employees = [];
     roles =[];
     db.query('SELECT employee.first_name, employee.last_name FROM employee', function (err, response) {
-        // console.log(response)
         if (err) throw err;
         for (i =0; i < response.length; i++) {
                 employeeFirstName = response[i].first_name;
                 employeeLastName = response[i].last_name;
                 employeeName = employeeFirstName + ' ' + employeeLastName;
-                // console.log(employeeName);
                 employees.push(employeeName);
         }
         console.log(employees)
@@ -207,20 +205,62 @@ function addEmployee() {
 
 };
 
-// function getManager(employeeId) {
-//     let managers = db.query(`SELECT manager_id FROM employee`);
-//     let employees = db.query(`SELECT employee.first_name, employee.last_name from employee`)
-//     let employeesNamesQuery = db.query(`SELECT employee.first_name, employee.last_name from employee`)
-//     let managerIdQuery = db.query(`SELECT manager_id FROM employee WHERE employee_id = ${employeeId};`);
-//     let managerNameQuery = db.query(`SELECT employee.first_name, employee.last_name from employee WHERE employee_id = ${manager_id};`);
-//     let subordinatesQuery = db.query(`SELECT employee.first_name, employee.last_name from employee WHERE manager_id = ${manager_id};`);
-
-
-//     console.log(managers);
-// }
+function updateRole() {
+    employees = [];
+    roles =[];
+    db.query('SELECT employee.employee_id, employee.first_name, employee.last_name FROM employee', function (err, response) {
+        // console.log(response)
+        if (err) throw err;
+        for (i =0; i < response.length; i++) {
+                employeeNumber = response[i].employee_id;
+                employeeFirstName = response[i].first_name;
+                employeeLastName = response[i].last_name;
+                employeeName = employeeNumber + '. '+ employeeFirstName + ' ' + employeeLastName;
+                employees.push(employeeName);
+        }
+        console.log(employees)
+    })
+    db.query('SELECT title FROM role', function (err, response) {
+        if (err) throw err;
+        for (i =0; i < response.length; i++) {
+            roles.push(response[i].title)
+        }    
+    })
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'employee',
+                message: 'Please enter the number of the employee whose role you would like to update:',
+                // choices: employees
+            },     
+            {
+                type: 'list',
+                name: 'title',
+                message: 'Please choose the new role for the employee:',
+                choices: roles
+            }
+        ])
+        .then(response => {
+            var employeeId = (response.employee);
+            var oldRoleId = db.query(`SELECT role_id FROM employee WHERE employee_id = ${employeeId};`);
+            var newRoleId = (roles.indexOf(response.title) + 1);
+            db.query(`UPDATE employee SET role_id = ${newRoleId} WHERE employee_id = ${employeeId};`, console.log("Employee role successfully updated!"));
+            getEmployees();
+        });
+}
 
 function quit() {
     db.end();
 }
 
 taskChoice();
+
+// queries 
+//     let managers = db.query(`SELECT manager_id FROM employee`);
+//     let employees = db.query(`SELECT employee.first_name, employee.last_name from employee`)
+//     let employeesNamesQuery = db.query(`SELECT employee.first_name, employee.last_name from employee`)
+//     let managerIdQuery = db.query(`SELECT manager_id FROM employee WHERE employee_id = ${employeeId};`);
+//     let roleIdQuery = db.query(`SELECT role_id FROM employee WHERE employee_id = ${employeeId};`);
+//     let managerNameQuery = db.query(`SELECT employee.first_name, employee.last_name from employee WHERE employee_id = ${manager_id};`);
+//     let subordinatesQuery = db.query(`SELECT employee.first_name, employee.last_name from employee WHERE manager_id = ${manager_id};`);
