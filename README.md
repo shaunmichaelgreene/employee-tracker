@@ -19,7 +19,7 @@
   To install, simply clone the repository and use command prompt "npm install". Console.table, inquirer (v8.2.4), mysql2, and validator are required, but are included as dependencies in the package.json file. Launch the application with the command “node server”.
 
   ## Usage
-  Simply follow the prompts in the CLI to explore and modify the database!
+  Simply follow the prompts in the CLI to explore and modify the database! An example seeds file has been provided for reference purposes. 
 
   ## Contributing
   Anything available for open-source contributions will be listed on the GitHub repository Issues page and marked accordingly.
